@@ -1,34 +1,51 @@
-<html>
-<head>
-	<title>Home for PDO</title>
-</head>
-<body>
-<div id="about" class="container-fluid">
-    <div class="row">
-      <div class="col-sm-8">
-        <h1 style="color:black">welcome to IS218 party!</h1>
-      </div>
-    </div>
-  </div>
+<?php
+require 'db.php';
+$action = $_POST['action'];
+if ($action == NULL) {
+  $action = 'login_page';
+} 
+if ($action == 'login_page') {
+  header('Location: login.html');
+}else if ($action =='test_user_valid') {
+  $email = $_POST['reg_uname'];
+  $pass = $_POST['reg_password'];
+  $sql = "select * from accounts where email='$email'";
+  $results = runQuery($sql);
+  if (count($results) > 0) {
+    if($results[0]['password'] == $pass) {
+      $fname = $results[0]['fname'];
+      $lname = $results[0]['lname'];
+      header("Location: task.php?fname=$fname&lname=$lname");
+    }else {
+      header('Location: badinfo.html');
+    }
+  }else{
+    header('Location: badinfo.html');
+  }
+}else if ($action == 'register') {
+  $email = $_POST['email'];
+  $sql = "select * from accounts where email = '$email' ";
+  $results = runQuery($sql);
+  if ((count($results) == 0)) {
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $phone = $_POST['phone'];
+    $birth = $_POST['birthday'];
+    $gender = $_POST['gender'];
+    $pass = $_POST['password'];
+    $sql = "insert into accounts (email, fname, lname, phone, birthday, gender, password) Values ('$email', '$fname', '$lname', '$phone', '$birth', '$gender', '$pass');";
+    $results = runQuery($sql);
+    header("Location: login.html");
+  }else{
+    header('Location: existedname.html');
+  } 
+} 
 
-  <div class="container" style="color:black"> 
-    <form method="get" action="test_db.php" >
-      <div class="form-group">
-        <label>Task:</label>
-        <!-- <input type="text" name="case_label" id="task"/> -->
-        <select name="case_label">
-          <option value="insert">insert</option>
-          <option value="update">update</option>
-          <option value="delete">delete</option>
-          <option value="down dir">down dir</option>
-          <option value="nonexist label">nonexist label</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <input type="submit" value="Send" />
-      </div>
-    </form>
-  </div>
-</body>
-</html>
-<?php require 'show.php'; ?>
+
+
+
+
+
+
+
+?>
